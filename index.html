@@ -161,24 +161,50 @@ form.addEventListener("submit", function(e) {
   }
 
   // 🔥 REPLACE THIS WITH YOUR WEB APP URL
-  const scriptURL = "https://script.google.com/macros/s/AKfycbxTRgzMf82BzJ_IR0Vc6fC2dRQGBPnfCtGbcCnvqh76ZMUiWQ9HU-PtFbLfYOiB50_a/exec";
+  const scriptURL = "https://script.google.com/macros/s/AKfycbwlKxQCeoV5ie1UyCQUxRDCRORgTkPIfMAncE4_okoGOL-uAO8b08qevRPCVFE1agm-ew/exec";
 
-  fetch(scriptURL, {
-    method: "POST",
-    body: JSON.stringify({ answers: answers }),
-    headers: {
-      "Content-Type": "application/json"
+  form.addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  const answers = [];
+
+  for (let i = 1; i <= 15; i++) {
+    const selected = document.querySelector(`input[name="q${i}"]:checked`);
+    if (!selected) {
+      alert("Please answer all 15 questions.");
+      return;
     }
-  })
-  .then(response => response.json())
-  .then(data => {
-    alert("Submission saved to Google Sheets!");
-    form.reset();
-  })
-  .catch(error => {
-    alert("Error saving submission.");
-    console.error(error);
+    answers.push(selected.value);
+  }
+
+  const unique = new Set(answers);
+  if (unique.size !== answers.length) {
+    alert("Each name can only be used once.");
+    return;
+  }
+
+  // 🔥 CHANGE THIS TO YOUR SCRIPT URL
+  const scriptURL = "PASTE_YOUR_WEB_APP_URL_HERE";
+
+  const hiddenForm = document.createElement("form");
+  hiddenForm.method = "POST";
+  hiddenForm.action = scriptURL;
+  hiddenForm.target = "_blank";
+
+  answers.forEach((answer, index) => {
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = "q" + (index + 1);
+    input.value = answer;
+    hiddenForm.appendChild(input);
   });
+
+  document.body.appendChild(hiddenForm);
+  hiddenForm.submit();
+
+  alert("Submission saved!");
+  form.reset();
+});
 });
 
 </script>
